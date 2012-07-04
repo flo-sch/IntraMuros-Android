@@ -1,4 +1,4 @@
-package app.intramuros.fr;
+package app.intramuros.fr.vendors;
 
 import java.io.BufferedReader;
 import java.io.IOException;
