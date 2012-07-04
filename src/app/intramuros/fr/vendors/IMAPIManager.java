@@ -1,4 +1,4 @@
-package app.intramuros.fr;
+package app.intramuros.fr.vendors;
 
 import android.content.Context;
 import android.os.Handler;

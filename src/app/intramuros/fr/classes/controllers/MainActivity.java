@@ -1,4 +1,4 @@
-package app.intramuros.fr;
+package app.intramuros.fr.classes.controllers;
 
 import android.app.Activity;
 import android.os.Bundle;

@@ -1,4 +1,4 @@
-package app.intramuros.fr;
+package app.intramuros.fr.classes.controllers;
 
 import java.util.ArrayList;
 
