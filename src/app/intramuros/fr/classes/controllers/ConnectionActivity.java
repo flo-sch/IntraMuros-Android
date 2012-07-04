@@ -9,10 +9,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import app.intramuros.fr.R;
 
 public class ConnectionActivity extends Activity implements OnClickListener {
 	private static final String TAG = "IM-CA";
@@ -23,7 +24,7 @@ public class ConnectionActivity extends Activity implements OnClickListener {
 	private Button submit_connection = null;
 	
     /** Called when the activity is first created. */
-    @Override
+	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.connection);
@@ -43,7 +44,6 @@ public class ConnectionActivity extends Activity implements OnClickListener {
     	this.submit_connection.setOnClickListener(this);
     }
     
-	@Override
 	public void onClick(View sender) {
 		switch (sender.getId()) {
 			case R.id.submit_connection:
