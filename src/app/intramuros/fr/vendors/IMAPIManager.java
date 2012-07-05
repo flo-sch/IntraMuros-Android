@@ -1,33 +1,30 @@
 package app.intramuros.fr.vendors;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
-import app.intramuros.fr.classes.models.User;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONObject;
 
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
+
+import app.intramuros.fr.classes.models.*;
 
 /**
  * 
@@ -47,7 +44,6 @@ public class IMAPIManager {
     private JsonParser jsonParser = null;
     private File jsonOutputFile;
     private File jsonFile;
-    private User user;
     
     public IMAPIManager(Context context) {
     	this.objectMapper = new ObjectMapper();
@@ -64,27 +60,64 @@ public class IMAPIManager {
      * 
      * @return String
      */
-    public String callAPIPath(String path, String method, String local_filename, ArrayList<String> parameters) {
+	public JsonParser callAPIPath(String path, String method, String local_filename, HashMap<String, String> parameters) {
     	Log.i(TAG, baseUrl + path);
     	URL completePath = null;
-    	user = null;
+    	jsonParser = null;
     	
 		try {
 			completePath = new URL(baseUrl + path);
+			HttpURLConnection APIconnection = (HttpURLConnection) completePath.openConnection();
+			APIconnection.setDoInput(true);
 			
 			if (method == "GET") {
 				downloadJsonFile(completePath.toString(), "GET", local_filename);
 				
-				HttpURLConnection APIconnection = (HttpURLConnection) completePath.openConnection();
-				APIconnection.setRequestMethod(method);
+				jsonParser = jsonFactory.createJsonParser(jsonFile);
+			} else if (method == "POST") {
+				APIconnection.setDoOutput(true);
+				APIconnection.setRequestMethod("POST");
+				
+			    String data = "";
+			    
+			    int i = 0;
+			    for (Iterator<Map.Entry<String, String>> iterator = parameters.entrySet().iterator(); iterator.hasNext();) {
+					Map.Entry<String, String> ent = iterator.next();
+					
+					if (i > 0) {
+						data += URLEncoder.encode("&", "UTF-8");
+					}
+					data += URLEncoder.encode((String) ent.getKey(), "UTF-8") + "=" + URLEncoder.encode((String) ent.getValue(), "UTF-8");
+					i++;
+				}
+			    
+			    Log.i(TAG, data.toString());
+			    
+				objectMapper.writeValue(APIconnection.getOutputStream(), data);
+
+			    APIconnection.connect();
+				int statusCode = APIconnection.getResponseCode();
+				
+				Log.i(TAG, String.format("statusCode : %d", statusCode));
+				
+				createFileAndDirectory(local_filename);
+	            
+	            FileOutputStream fileOutput = new FileOutputStream(jsonFile);
+	            InputStream inputStream = APIconnection.getInputStream();
+	            
+	            byte[] buffer = new byte[1024];
+	            int bufferLength = 0;
+	            while ((bufferLength = inputStream.read(buffer)) > 0) {
+	            	fileOutput.write(buffer, 0, bufferLength);
+	            }
+	            
+	            fileOutput.close();
 				
 				jsonParser = jsonFactory.createJsonParser(jsonFile);
-		        user = objectMapper.readValue(jsonParser, User.class);
-		        
-			} else if (method == "POST") {
 				
 			}
-		} catch (MalformedURLException MUE) {
+		}
+		catch (MalformedURLException MUE) {
         	Log.e(TAG, MUE.getMessage());
         }
     	catch (IOException IOE) {
@@ -94,8 +127,56 @@ public class IMAPIManager {
     		Log.e(TAG, E.getMessage());
     	}
     	
-		return null;
+		return jsonParser;
     }
+    
+	public ArrayList<User> getAllUsers() {
+    	ArrayList<User> users = new ArrayList<User>();
+    	
+    	try {
+    		jsonParser = this.callAPIPath("api/users/lookup", "GET", "users", null);
+    		users.add(objectMapper.readValue(jsonParser, User.class));
+		}
+    	catch (JsonParseException JPE) {
+			// TODO Auto-generated catch block
+			Log.e(TAG, JPE.getMessage());
+			JPE.printStackTrace();
+		} catch (JsonMappingException JME) {
+			// TODO Auto-generated catch block
+			Log.e(TAG, JME.getMessage());
+			JME.printStackTrace();
+		} catch (IOException IOE) {
+			// TODO Auto-generated catch block
+			Log.e(TAG, IOE.getMessage());
+			IOE.printStackTrace();
+		}
+        
+    	return users;
+    }
+	
+	public User registerUser(HashMap<String, String> parameters) {
+		User user = null;
+		
+		jsonParser = this.callAPIPath("users/register", "POST", "user", parameters);
+		try {
+			user = objectMapper.readValue(jsonParser, User.class);
+		}
+		catch (JsonParseException JPE) {
+			// TODO Auto-generated catch block
+			Log.e(TAG, JPE.getMessage());
+			JPE.printStackTrace();
+		} catch (JsonMappingException JME) {
+			// TODO Auto-generated catch block
+			Log.e(TAG, JME.getMessage());
+			JME.printStackTrace();
+		} catch (IOException IOE) {
+			// TODO Auto-generated catch block
+			Log.e(TAG, IOE.getMessage());
+			IOE.printStackTrace();
+		}
+		
+		return user;
+	}
     
     /**
      * write a remote JSON file's content in a local file
@@ -111,7 +192,7 @@ public class IMAPIManager {
             
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod(method);
-            urlConnection.setDoOutput(true);
+            urlConnection.setDoInput(true);
             urlConnection.connect();
             
             FileOutputStream fileOutput = new FileOutputStream(jsonFile);

@@ -23,7 +23,7 @@ public class MainActivity extends Activity {
         	this.APIManager.callAPIPath("api/users/lookup", "GET", "user", null);
         }
         catch (NullPointerException NPE) {
-        	Log.e(TAG, NPE.getMessage());
+        	Log.e(TAG, "NPE caused by " + NPE.getCause() + " --> " + NPE.getMessage());
         }
         catch (Exception E) {
         	Log.e(TAG, E.toString());

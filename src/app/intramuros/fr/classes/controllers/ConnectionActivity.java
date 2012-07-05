@@ -1,6 +1,7 @@
 package app.intramuros.fr.classes.controllers;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
@@ -14,14 +15,18 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import app.intramuros.fr.R;
+import app.intramuros.fr.classes.models.User;
+import app.intramuros.fr.vendors.IMAPIManager;
 
 public class ConnectionActivity extends Activity implements OnClickListener {
 	private static final String TAG = "IM-CA";
-	private TextView label_username, error_empty_username = null;
-	private TextView label_email, error_empty_email = null;
+	private TextView error_empty_username = null;
+	private TextView error_empty_email = null;
 	private EditText field_username = null;
 	private EditText field_email = null;
 	private Button submit_connection = null;
+	
+	private IMAPIManager APIManager = null;
 	
     /** Called when the activity is first created. */
 	@Override
@@ -33,8 +38,8 @@ public class ConnectionActivity extends Activity implements OnClickListener {
     }
     
     private void initProperties() {
-    	this.label_username = (TextView)findViewById(R.id.label_username);
-    	this.label_email = (TextView)findViewById(R.id.label_email);
+    	this.APIManager = new IMAPIManager(this);
+    	
     	this.field_username = (EditText)findViewById(R.id.field_username);
     	this.field_email = (EditText)findViewById(R.id.field_email);
     	this.error_empty_username = (TextView)findViewById(R.id.error_empty_username);
@@ -70,6 +75,16 @@ public class ConnectionActivity extends Activity implements OnClickListener {
 					}
 					
 					if (errors.size() == 0) {
+						HashMap<String, String> parameters = new HashMap<String, String>();
+						
+						parameters.put("username", this.field_username.getText().toString());
+						parameters.put("email", this.field_email.getText().toString());
+						
+						User user = APIManager.registerUser(parameters);
+						
+						Log.i(TAG, user.getUsername());
+						
+						
 						Intent mainActivity = new Intent(ConnectionActivity.this, MainActivity.class);
 						
 						startActivity(mainActivity);
@@ -78,8 +93,11 @@ public class ConnectionActivity extends Activity implements OnClickListener {
 				catch (ActivityNotFoundException ANFE) {
 					Log.e(TAG, ANFE.getMessage());
 				}
-				catch (NullPointerException NPE) {
-					Log.e(TAG, NPE.toString());
+		        catch (NullPointerException NPE) {
+		        	Log.e(TAG, "NPE caused by " + NPE.getCause() + " --> " + NPE.getMessage());
+		        }
+				catch (Exception E) {
+					Log.e(TAG, E.getMessage());
 				}
 				break;
 		}
