@@ -140,7 +140,7 @@ public class IMAPIManager {
 						Map.Entry<String, String> ent = iterator.next();
 						
 						if (i > 0) {
-							encodedParams += URLEncoder.encode("&", "UTF-8");
+							encodedParams += "&";
 						}
 						encodedParams += URLEncoder.encode((String) ent.getKey(), "UTF-8") + "=" + URLEncoder.encode((String) ent.getValue(), "UTF-8");
 						i++;
@@ -149,7 +149,6 @@ public class IMAPIManager {
 				    Log.i(TAG, encodedParams.toString());
 				    
 					try {
-						//objectMapper.writeValue(APIconnection.getOutputStream(), encodedParams);
 						OutputStream os = APIconnection.getOutputStream();
 						os.write(encodedParams.getBytes("UTF-8"));
 					}
@@ -171,6 +170,7 @@ public class IMAPIManager {
 				    
 					int statusCode = APIconnection.getResponseCode();
 					if ((statusCode >= HttpURLConnection.HTTP_OK) && (statusCode < HttpURLConnection.HTTP_MULT_CHOICE)) {
+						Log.i(TAG, "statusCode correct !!");
 			            callbackParser = jsonFactory.createJsonParser(APIconnection.getInputStream());
 					} else {
 						Log.w(TAG, String.format("statusCode : %d", statusCode));
@@ -181,27 +181,29 @@ public class IMAPIManager {
 					}
 				}
 				if (callbackParser != null) {
-					response = objectMapper.readValue(callbackParser, responseClass.getClass());
+					Log.i(TAG, responseClass.getClass().toString());
+					response = objectMapper.readValue(callbackParser, (Class<Object>) responseClass);
+					Log.i(TAG, "response has been read");
 				}
 			}
 			catch (NullPointerException NPE) {
-				Log.e(IMAPIManager.TAG, "NPE" + NPE.getMessage());
+				Log.e(IMAPIManager.TAG, "NPE : " + NPE.getMessage());
 				NPE.printStackTrace();
 			}
 			catch (JsonParseException JPE) {
-				Log.e(IMAPIManager.TAG, "JPE" + JPE.getMessage());
+				Log.e(IMAPIManager.TAG, "JPE : " + JPE.getMessage());
 				JPE.printStackTrace();
 			}
 			catch (JsonMappingException JME) {
-				Log.e(IMAPIManager.TAG, "JME" + JME.getMessage());
+				Log.e(IMAPIManager.TAG, "JME : " + JME.getMessage());
 				JME.printStackTrace();
 			}
 			catch (MalformedURLException MUE) {
-				Log.e(IMAPIManager.TAG, "MUE" + MUE.getMessage());
+				Log.e(IMAPIManager.TAG, "MUE : " + MUE.getMessage());
 				MUE.printStackTrace();
 			}
 			catch (IOException IOE) {
-				Log.e(IMAPIManager.TAG, "IOE" + IOE.getMessage());
+				Log.e(IMAPIManager.TAG, "IOE : " + IOE.getMessage());
 				IOE.printStackTrace();
 			}
 			finally {
@@ -218,6 +220,7 @@ public class IMAPIManager {
             
 			// Send responseObject to UIThread
 			if (responseObject != null) {
+				Log.i(TAG, "responseObject is not null");
 				Message msg = messageHandler.obtainMessage(activityCode);
 				Log.i(IMAPIManager.TAG, "code : " + activityCode);
 				msg.what = activityCode;

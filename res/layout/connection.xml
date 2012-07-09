@@ -4,15 +4,15 @@
     android:layout_height="fill_parent"
     android:gravity="center"
     android:orientation="vertical"
-    android:background="@color/white" >
+    android:background="@drawable/background_grey" >
 
     <ImageView
         android:id="@+id/imageView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="50dip"
-        android:src="@drawable/ic_launcher"
-        android:contentDescription="@string/alt_icon" />
+        android:contentDescription="@string/alt_icon"
+        android:src="@drawable/im_logo" />
     
     <EditText
         android:id="@+id/field_username"
