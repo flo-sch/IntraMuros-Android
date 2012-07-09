@@ -7,4 +7,8 @@
     <color name="white">#FFFFFF</color>
     <string name="error_empty_username">Veuillez saisir un nom d\'utilisateur</string>
     <string name="error_empty_email">Veuillez saisir une adresse email</string>
+    <string name="placeholder_username">Tapez votre nom</string>
+    <string name="placeholder_email">Tapez votre adresse email</string>
+    <string name="alt_icon">icône IntraMuros</string>
+    <string name="loader_message">Chargement en cours...</string>
 </resources>

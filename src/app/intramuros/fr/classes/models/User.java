@@ -2,7 +2,6 @@ package app.intramuros.fr.classes.models;
 
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.Map;
 
 import org.json.JSONObject;
 

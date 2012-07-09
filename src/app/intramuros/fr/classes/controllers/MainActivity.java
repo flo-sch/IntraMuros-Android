@@ -1,13 +1,14 @@
 package app.intramuros.fr.classes.controllers;
 
-import org.json.JSONObject;
-
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
+import app.intramuros.fr.R;
+import app.intramuros.fr.vendors.IMAPIManager;
 
 public class MainActivity extends Activity {
 	private static final String TAG = "IM - MainActivity";
+	
 	public IMAPIManager APIManager = null;
 	
 	/** Called when the activity is first created. */
@@ -16,16 +17,13 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         
-        this.APIManager = new IMAPIManager(this);
+        //this.APIManager = new IMAPIManager(this);
         
         try {
-        	String callback = this.APIManager.callAPIPath("api/users/lookup", "GET", null);
-        	JSONObject jObject = new JSONObject(callback);
-        	Log.i(TAG, jObject.length() + " keys");
-        	//Log.i(TAG, callback.toString());
+        	//this.APIManager.callAPIPath("api/users/lookup", "GET", "user", null);
         }
         catch (NullPointerException NPE) {
-        	Log.e(TAG, NPE.getMessage());
+        	Log.e(TAG, "NPE caused by " + NPE.getCause() + " --> " + NPE.getMessage());
         }
         catch (Exception E) {
         	Log.e(TAG, E.toString());

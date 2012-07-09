@@ -1,29 +1,55 @@
 package app.intramuros.fr.classes.controllers;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import app.intramuros.fr.R;
+import app.intramuros.fr.classes.models.User;
+import app.intramuros.fr.vendors.IMAPIManager;
+
 public class ConnectionActivity extends Activity implements OnClickListener {
 	private static final String TAG = "IM-CA";
-	private TextView label_username, error_empty_username = null;
-	private TextView label_email, error_empty_email = null;
+	private TextView error_empty_username = null;
+	private TextView error_empty_email = null;
 	private EditText field_username = null;
 	private EditText field_email = null;
 	private Button submit_connection = null;
 	
+	private IMAPIManager APIManager = null;
+	
+	public static final int REGISTER_USER = 1;
+	
+	private final Handler handler = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			switch (msg.what) {
+				case REGISTER_USER:
+					// Store User to preferences
+					Log.i(TAG, "FUCK YEAH !");
+					Intent mainActivity = new Intent(ConnectionActivity.this, MainActivity.class);
+					startActivity(mainActivity);
+					break;
+				default:
+					break;
+			}
+		}
+	};
+	
     /** Called when the activity is first created. */
-    @Override
+	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.connection);
@@ -32,8 +58,8 @@ public class ConnectionActivity extends Activity implements OnClickListener {
     }
     
     private void initProperties() {
-    	this.label_username = (TextView)findViewById(R.id.label_username);
-    	this.label_email = (TextView)findViewById(R.id.label_email);
+    	this.APIManager = new IMAPIManager(this, handler);
+    	
     	this.field_username = (EditText)findViewById(R.id.field_username);
     	this.field_email = (EditText)findViewById(R.id.field_email);
     	this.error_empty_username = (TextView)findViewById(R.id.error_empty_username);
@@ -43,7 +69,6 @@ public class ConnectionActivity extends Activity implements OnClickListener {
     	this.submit_connection.setOnClickListener(this);
     }
     
-	@Override
 	public void onClick(View sender) {
 		switch (sender.getId()) {
 			case R.id.submit_connection:
@@ -70,16 +95,23 @@ public class ConnectionActivity extends Activity implements OnClickListener {
 					}
 					
 					if (errors.size() == 0) {
-						Intent mainActivity = new Intent(ConnectionActivity.this, MainActivity.class);
+						HashMap<String, String> parameters = new HashMap<String, String>();
 						
-						startActivity(mainActivity);
+						parameters.put("username", this.field_username.getText().toString());
+						parameters.put("email", this.field_email.getText().toString());
+						
+						APIManager.registerUser(parameters);
 					}
 				}
 				catch (ActivityNotFoundException ANFE) {
 					Log.e(TAG, ANFE.getMessage());
 				}
-				catch (NullPointerException NPE) {
-					Log.e(TAG, NPE.toString());
+		        catch (NullPointerException NPE) {
+		        	Log.e(TAG, "NPE caused by " + NPE.getCause() + " --> " + NPE.getMessage());
+		        	NPE.printStackTrace();
+		        }
+				catch (Exception E) {
+					Log.e(TAG, "E caused by " + E.getCause() + " --> " + E.getMessage());
 				}
 				break;
 		}
