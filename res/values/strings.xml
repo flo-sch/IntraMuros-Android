@@ -4,11 +4,21 @@
     <string name="label_username">Username</string>
     <string name="label_email">Email</string>
     <string name="submit_connection">Connexion</string>
-    <color name="white">#FFFFFF</color>
     <string name="error_empty_username">Veuillez saisir un nom d\'utilisateur</string>
     <string name="error_empty_email">Veuillez saisir une adresse email</string>
     <string name="placeholder_username">Tapez votre nom</string>
     <string name="placeholder_email">Tapez votre adresse email</string>
+    <string name="loader_message">Chargement en cours&#8230;</string>
+    <!-- Connection -->
+    <string name="text_connection_welcome">Bienvenue :</string>
+    <string name="text_connection_team_label">Tu fais partie des :</string>
+    <string name="text_connection_mission_label">Ta mission :</string>
+    <string name="text_connection_mission_content">Aider ton équipe à conquérir toutes les zones de Paris</string>
+    <string name="text_connection_opponent_label">Tes adversaires :</string>
+    <string name="text_connection_button_content">Jouer</string>
+    <!-- Alt contents -->
     <string name="alt_icon">icône IntraMuros</string>
-    <string name="loader_message">Chargement en cours...</string>
+    <!-- Colors -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
 </resources>

@@ -1,6 +1,5 @@
 package app.intramuros.fr.vendors;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -20,7 +19,6 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.widget.ProgressBar;
 
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerationException;
@@ -58,6 +56,7 @@ public class IMAPIManager {
     	this.messageHandler = handler;
     }
     
+	@SuppressWarnings("unchecked")
 	public void getAllUsers() {
     	try {
 	    	IMAPICaller caller = new IMAPICaller(this);
@@ -73,6 +72,7 @@ public class IMAPIManager {
 		}
     }
 	
+	@SuppressWarnings("unchecked")
 	public void registerUser(HashMap<String, String> parameters) {
 		try {
 			IMAPICaller caller = new IMAPICaller(this);
@@ -90,10 +90,10 @@ public class IMAPIManager {
 		}
 	}
     
-    private class IMAPICaller extends AsyncTask<HashMap<String, Object>, Integer, Object> {
+    private class IMAPICaller extends AsyncTask<HashMap<String, Object>, Integer, HashMap<String, Object>> {
         private HttpURLConnection APIconnection = null;
         int activityCode = 0;
-        Object response = null;
+        HashMap<String, Object> response = null;
         public ProgressDialog loader = null;
         
         public IMAPICaller(IMAPIManager APIManager) {
@@ -110,8 +110,9 @@ public class IMAPIManager {
         	this.loader.show();
         }
     	
+		@SuppressWarnings("unchecked")
 		@Override
-		protected Object doInBackground(HashMap<String, Object>... args) {
+		protected  HashMap<String, Object> doInBackground(HashMap<String, Object>... args) {
 			String URLPath = (String) args[0].get("path");
 			String method = (String) args[0].get("method");
 			HashMap<String, String> parameters = (HashMap<String, String>) args[0].get("parameters");
@@ -123,6 +124,7 @@ public class IMAPIManager {
 			try {
 				completePath = new URL(IMAPIManager.baseUrl + URLPath);
 				APIconnection = (HttpURLConnection) completePath.openConnection();
+				APIconnection.setDoInput(true);
 				
 				if (method == "GET") {
 					APIconnection.setRequestMethod("GET");
@@ -181,8 +183,10 @@ public class IMAPIManager {
 					}
 				}
 				if (callbackParser != null) {
-					Log.i(TAG, responseClass.getClass().toString());
-					response = objectMapper.readValue(callbackParser, (Class<Object>) responseClass);
+					Log.i(TAG, "response : " + responseClass.toString());
+					Log.i(TAG, "callback : " + callbackParser.getClass().toString());
+					Log.i(TAG, callbackParser.toString());
+					response = objectMapper.readValue(callbackParser, HashMap.class);
 					Log.i(TAG, "response has been read");
 				}
 			}
@@ -195,7 +199,7 @@ public class IMAPIManager {
 				JPE.printStackTrace();
 			}
 			catch (JsonMappingException JME) {
-				Log.e(IMAPIManager.TAG, "JME : " + JME.getMessage());
+				Log.e(IMAPIManager.TAG, "JME : " + JME.getMessage() + " caused by : " + JME.getCause());
 				JME.printStackTrace();
 			}
 			catch (MalformedURLException MUE) {
@@ -214,13 +218,13 @@ public class IMAPIManager {
 		}
 		
 		@Override
-		protected void onPostExecute(Object responseObject) {
+		protected void onPostExecute(HashMap<String, Object> responseObject) {
             Log.i(IMAPIManager.TAG, "onPostExecute");
             this.loader.cancel();
             
 			// Send responseObject to UIThread
 			if (responseObject != null) {
-				Log.i(TAG, "responseObject is not null");
+				Log.i(TAG, "responseObject is not null [ instance of Class : " + responseObject.getClass().toString() + "]");
 				Message msg = messageHandler.obtainMessage(activityCode);
 				Log.i(IMAPIManager.TAG, "code : " + activityCode);
 				msg.what = activityCode;

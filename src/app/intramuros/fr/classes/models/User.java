@@ -1,13 +1,20 @@
 package app.intramuros.fr.classes.models;
 
+import java.io.Serializable;
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 
 import org.json.JSONObject;
 
-public class User {
+import android.util.Log;
+import app.intramuros.fr.vendors.IMDateFormatter;
+
+public class User implements Serializable {
+	private static final long serialVersionUID = 6816218199982487747L;
+	private static final String TAG = "IM-Model-User";
 	protected String id;
-	protected GregorianCalendar registredAt;
+	protected Calendar registredAt;
 	protected String username;
 	protected String email;
 	protected Integer score;
@@ -17,7 +24,12 @@ public class User {
 	protected Team team;
 	protected String avatar;
 	
-	public User(String id, GregorianCalendar registredAt, String username, String email, Integer score, Integer bonus, Integer sessionsOpened, Integer sessionsWon, Team team, String avatar) {
+	public User() {
+		Log.i(TAG, "Empty __construct()");
+	}
+	
+	public User(String id, Calendar registredAt, String username, String email, Integer score, Integer bonus, Integer sessionsOpened, Integer sessionsWon, Team team, String avatar) {
+		Log.i(TAG, "values __construct()");
 		this.id = id;
 		this.registredAt = registredAt;
 		this.username = username;
@@ -31,12 +43,34 @@ public class User {
 	}
 	
 	public User(JSONObject attributes) {
-		
+		Log.i(TAG, "JSON __construct()");
 	}
 	
+	@SuppressWarnings("unchecked")
 	public User(HashMap<String, Object> attributes) {
+		Log.i(TAG, "HashMap __construct()");
 		this.id = (String) attributes.get("id");
-		this.registredAt = (GregorianCalendar) attributes.get("registredAt");
+		
+		HashMap <String, Object> registredAt = (HashMap<String, Object>) attributes.get("registredAt");
+		IMDateFormatter formatter = new IMDateFormatter();
+		this.registredAt = formatter.getCalendarFromJson((String) registredAt.get("date"));
+		
+		
+		this.username = (String) attributes.get("username");
+		this.email = (String) attributes.get("email");
+		this.score = (Integer) attributes.get("score");
+		this.bonus = (Integer) attributes.get("bonus");
+		this.sessionsOpened = (Integer) attributes.get("sessionsOpened");
+		this.sessionsWon = (Integer) attributes.get("sessionsWon");
+		
+		this.team = new Team((HashMap<String, Object>) attributes.get("team"));
+		this.avatar = (String) attributes.get("avatar");
+	}
+	
+	public void initWithAttributes(HashMap<String, Object> attributes) {
+		Log.i(TAG, "HashMap initWithAttributes");
+		this.id = (String) attributes.get("id");
+		this.registredAt = (Calendar) attributes.get("registredAt");
 		this.username = (String) attributes.get("username");
 		this.email = (String) attributes.get("email");
 		this.score = (Integer) attributes.get("score");
@@ -59,7 +93,7 @@ public class User {
 		this.registredAt = registredAt;
 	}
 	
-	public GregorianCalendar getRegistredAt() {
+	public Calendar getRegistredAt() {
 		return this.registredAt;
 	}
 	

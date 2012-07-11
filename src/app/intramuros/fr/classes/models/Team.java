@@ -1,8 +1,10 @@
 package app.intramuros.fr.classes.models;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
-public class Team {
+public class Team implements Serializable {
+	private static final long serialVersionUID = -5325782059242634848L;
 	protected String id;
 	protected Integer indice;
 	protected String name;
