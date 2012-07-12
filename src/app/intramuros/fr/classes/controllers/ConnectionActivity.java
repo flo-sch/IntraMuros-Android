@@ -13,11 +13,9 @@ import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import app.intramuros.fr.R;
@@ -28,8 +26,6 @@ import app.intramuros.fr.vendors.IMInternalStorageManager;
 @SuppressLint("HandlerLeak")
 public class ConnectionActivity extends Activity implements OnClickListener {
 	private static final String TAG = "IM-CA";
-	
-	private LinearLayout rootLayout = null;
 	
 	private final static int _layoutForm = R.layout.im_connection_form;
 	private final static int _layoutCallback = R.layout.im_connexion_callback;
@@ -76,20 +72,29 @@ public class ConnectionActivity extends Activity implements OnClickListener {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        rootLayout = new LinearLayout(this);
-        rootLayout.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-        setContentView(rootLayout);
-        
 		this.APIManager = new IMAPIManager(this, handler);
         
+		User registredUser = (User) IMInternalStorageManager.getObjectFromInternalStorage("user", this);
+		
+		if (registredUser != null) {
+			// Launch application directly
+			try {
+				Intent mainActivity = new Intent(ConnectionActivity.this, MainActivity.class);
+				startActivity(mainActivity);
+			}
+			catch (NullPointerException NPE) {
+				NPE.printStackTrace();
+			}
+			catch (ActivityNotFoundException ANFE) {
+				ANFE.printStackTrace();
+			}
+		}
+		
         this.initProperties(_layoutForm);
     }
     
     private void initProperties(int layout) {
-    	rootLayout.removeAllViews();
-    	// Display layout
-    	rootLayout.addView(getLayoutInflater().inflate(layout, null));
-    	
+    	setContentView(layout);
     	switch (layout) {
 	    	case _layoutForm:
 	        	this.field_username = (EditText)findViewById(R.id.field_username);
