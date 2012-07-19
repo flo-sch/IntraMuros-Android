@@ -107,6 +107,7 @@ public class IMAPIManager {
             	this.loader = new ProgressDialog(contextActivity);
             }
             this.loader.setMessage(contextActivity.getString(R.string.loader_message));
+    		this.loader.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         	this.loader.show();
         }
     	

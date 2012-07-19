@@ -21,4 +21,14 @@
     <!-- Colors -->
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
+    <!--  Activities Names -->
+    <string name="activity_snail">Escargot</string>
+    <string name="activity_map">Carte</string>
+    <string name="activity_checkin">Check-in</string>
+    <string name="activity_chat">Chat</string>
+    <string name="activity_timeline">Timeline</string>
+    <string name="activity_user_stats">Stats - User</string>
+    <string name="activity_team_stats">Stats - Team</string>
+    <string name="activity_settings">Paramètres</string>
+    <string name="activity_flashgames">Flashgames</string>
 </resources>

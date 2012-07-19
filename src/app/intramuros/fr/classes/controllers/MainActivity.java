@@ -2,6 +2,8 @@ package app.intramuros.fr.classes.controllers;
 
 import java.util.HashMap;
 
+import android.app.ActionBar;
+import android.app.ActionBar.Tab;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
@@ -15,6 +17,7 @@ import app.intramuros.fr.classes.models.User;
 import app.intramuros.fr.vendors.IMAPIManager;
 import app.intramuros.fr.vendors.IMInterfaceLoader;
 import app.intramuros.fr.vendors.IMInternalStorageManager;
+import app.intramuros.fr.vendors.IMTabListener;
 
 public class MainActivity extends Activity {
 	private static final String TAG = "IM - MainActivity";
@@ -24,6 +27,7 @@ public class MainActivity extends Activity {
 	private TabHost.TabSpec _tabSpec = null;
 	protected User registredUser = null;
 	public IMAPIManager APIManager = null;
+	public ActionBar actionBar = null;
 	
 	private final Handler handler = new Handler() {
 		@Override
@@ -39,17 +43,41 @@ public class MainActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.initProperties(_snailView);
+        //this.initProperties(_snailView);
         
         this.APIManager = new IMAPIManager(this, handler);
         this.registredUser = (User) IMInternalStorageManager.getObjectFromInternalStorage("user", this);
         
         Log.i(TAG, this.registredUser.getTeam().getName());
         
-        this._tabBar = (TabHost)findViewById(R.id._tabbar);
-        this._tabBar.setup();
+        actionBar = getActionBar();
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        actionBar.setDisplayShowTitleEnabled(false);
         
-        this.initTabbar();
+        /* Init each tab */
+        Tab tab = null;
+        
+        // Snail
+        tab = actionBar.newTab();
+        tab.setText(R.string.activity_snail);
+        tab.setTabListener(new IMTabListener<SnailFragment>(this, "snail", SnailFragment.class));
+        actionBar.addTab(tab);
+        actionBar.setSelectedNavigationItem(0);
+        actionBar.selectTab(tab);
+        
+
+        // Chat
+        tab = actionBar.newTab();
+        tab.setText(R.string.activity_chat);
+        tab.setTabListener(new IMTabListener<ChatFragment>(this, "chat", ChatFragment.class));
+        actionBar.addTab(tab);
+        
+
+        // Map
+        tab = actionBar.newTab();
+        tab.setText(R.string.activity_map);
+        tab.setTabListener(new IMTabListener<MapFragment>(this, "map", MapFragment.class));
+        actionBar.addTab(tab);
     }
     
     private void initProperties(int layout) {
@@ -59,35 +87,6 @@ public class MainActivity extends Activity {
     		case _snailView:
     			
     			break;
-    	}
-    }
-    
-    private void initTabbar() {
-        // Initialize a TabSpec for each tab and add it to the TabHost with an intent as the content activity
-    	Intent intent = null;
-    	HashMap<String, Object> interfaceProperties = IMInterfaceLoader.getInterfaceProperties(this);
-    	
-    	try {
-	    	intent = new Intent().setClass(this, CheckinActivity.class);
-	        _tabSpec = _tabBar.newTabSpec("checkin").setIndicator("Checkin", getResources().getDrawable((Integer) interfaceProperties.get("icon_checkin"))).setContent(intent);
-	        _tabBar.addTab(_tabSpec);
-	        
-	        intent = new Intent().setClass(this, ChatActivity.class);
-	        _tabSpec = _tabBar.newTabSpec("chat").setIndicator("Chat",  getResources().getDrawable((Integer) interfaceProperties.get("icon_chat"))).setContent(intent);
-	        _tabBar.addTab(_tabSpec);
-	
-	        intent = new Intent().setClass(this, MapActivity.class);
-	        _tabSpec = _tabBar.newTabSpec("map").setIndicator("Map",  getResources().getDrawable((Integer) interfaceProperties.get("icon_map"))).setContent(intent);
-	        _tabBar.addTab(_tabSpec);
-    	}
-    	catch (NullPointerException NPE) {
-    		NPE.printStackTrace();
-    	}
-    	catch (ActivityNotFoundException ANFE) {
-    		ANFE.printStackTrace();
-    	}
-    	catch (IllegalStateException ISE) {
-    		ISE.printStackTrace();
     	}
     }
 }

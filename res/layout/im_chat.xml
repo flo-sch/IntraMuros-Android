@@ -5,5 +5,10 @@
     android:background="@drawable/background_grey"
     android:gravity="center"
     android:orientation="vertical" >
-    
+
+    <WebView
+        android:id="@+id/im_chat_webview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+	
 </LinearLayout>
